@@ -67,6 +67,7 @@ import kotlin.coroutines.resumeWithException
  * 类使用 Kotlin 协程进行异步操作，通过 suspendCancellableCoroutine 函数处理异常。
  */
 class CameraSource(
+    //相机预览类
     private val surfaceView: SurfaceView,
     private val listener: CameraSourceListener? = null
 ) {
@@ -80,6 +81,7 @@ class CameraSource(
         private const val TAG = "Camera Source"
     }
 
+    //用作同步锁
     private val lock = Any()
     private var detector: PoseDetector? = null
     private var classifier: PoseClassifier? = null
@@ -93,6 +95,8 @@ class CameraSource(
     private var framesPerSecond = 0
 
     /** Detects, characterizes, and connects to a CameraDevice (used for all camera operations) */
+    //这一行代码的目的是为了延迟初始化cameraManager，当首次访问cameraManager时，它会通过surfaceView的
+    //上下文获取相机服务，并将其转换为CameraManager类型。
     private val cameraManager: CameraManager by lazy {
         val context = surfaceView.context
         context.getSystemService(Context.CAMERA_SERVICE) as CameraManager
@@ -118,6 +122,7 @@ class CameraSource(
         camera = openCamera(cameraManager, cameraId)
         imageReader =
             ImageReader.newInstance(PREVIEW_WIDTH, PREVIEW_HEIGHT, ImageFormat.YUV_420_888, 3)
+        //通过setOnImageAvailableListener方法，为imageReader设置了一个监听器。当新的图像数据变得可用时，这个监听器会被触发。
         imageReader?.setOnImageAvailableListener({ reader ->
             val image = reader.acquireLatestImage()
             if (image != null) {
