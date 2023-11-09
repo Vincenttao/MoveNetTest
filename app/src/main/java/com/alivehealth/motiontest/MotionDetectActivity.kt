@@ -121,7 +121,7 @@ class MotionDetectActivity : ComponentActivity() {
         }
 
 
-
+    //初始赋值，并引入布局
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -146,7 +146,7 @@ class MotionDetectActivity : ComponentActivity() {
             requestPermission()
         }
     }
-
+    //启动项目
     override fun onStart() {
         super.onStart()
         openCamera()
@@ -172,15 +172,21 @@ class MotionDetectActivity : ComponentActivity() {
         ) == PackageManager.PERMISSION_GRANTED
     }
 
+    /**
+    *创建一个新的CameraSource实例，并传入一个surfaceView和一个CameraSourceListener匿名类的实例
+    *在CameraSource类中重写fun onFPSListener判断帧率，fun onDetectedInfo实现监测信息
+    **/
     private fun openCamera() {
         if (isCameraPermissionGranted()) {
             if (cameraSource == null) {
                 cameraSource =
                     CameraSource(surfaceView, object : CameraSource.CameraSourceListener {
+                        //输出FPS信息
                         override fun onFPSListener(fps: Int) {
                             tvFPS.text = getString(R.string.tfe_pe_tv_fps, fps)
                         }
 
+                        //DetectedInfo 输出整体检测score和姿势检测结果
                         override fun onDetectedInfo(
                             personScore: Float?,
                             poseLabels: List<Pair<String, Float>>?
